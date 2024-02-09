@@ -1,0 +1,23 @@
+# Use the appropriate base image for Windows
+FROM mcr.microsoft.com/windows/servercore:ltsc2019
+
+# Install Node.js
+RUN powershell -Command \
+    Invoke-WebRequest -Uri https://nodejs.org/dist/v12.18.0/node-v12.18.0-x64.msi -OutFile nodejs.msi; \
+    Start-Process msiexec.exe -ArgumentList '/i', 'nodejs.msi', '/quiet', '/norestart' -NoNewWindow -Wait; \
+    Remove-Item -Force nodejs.msi
+
+# Set the working directory
+WORKDIR /app
+
+# Install http-server globally
+RUN npm install -g http-server
+
+# Copy the application files
+COPY . .
+
+# Create a sample HTML file
+RUN echo 'hello' > hello.html
+
+# Start http-server in the background
+CMD ["http-server", "-p", "8000"]
